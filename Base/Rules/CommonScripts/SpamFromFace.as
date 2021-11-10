@@ -1,63 +1,59 @@
 
-void onTick(CRules@ this)
+#define SERVER_ONLY
+
+string item_to_spam_string = "item to spam";
+string spam_timer_string = "spam counter";
+string spam_delay_string = "spam delay";
+
+void onTick(CBlob@ this)
 {
-	string itemToSpam = this.get_string("item to spam");
-	if(itemToSpam != "")
+	string item_to_spam = this.get_string(item_to_spam_string);
+	if(item_to_spam != "")
 	{
-		this.set_u8("spam count",this.get_u8("spam count") + 1);
-		if(this.get_u8("spam count") > this.get_u8("spam delay"))
+		// Check if we're ready to spam
+		this.set_u8(spam_timer_string, this.get_u8(spam_timer_string) + 1);
+		if(this.get_u8(spam_timer_string) > this.get_u8(spam_delay_string))
 		{
-			this.set_u8("spam count", 0);
-			CBlob@[] b;
-			getBlobsByTag("player",@b);
-			for(u8 i=0;i<b.length;i++)
+			// Reset the timer
+			this.set_u8(spam_timer_string, 0);
+			
+			// Spawn our item
+			CBlob@ item = server_CreateBlobNoInit(item_to_spam);
+			if(item !is null)
 			{
-				CBlob@ c=b[i];
-				if(c !is null)
+				// Special actions
+				if(this.get_bool("boom?"))
 				{
-					Vec2f pos = c.getPosition();
-					Vec2f mouse = c.getAimPos();
-					CBlob@ item = server_CreateBlobNoInit(itemToSpam);
-					if(item !is null)
+					if(item_to_spam == "arrow")
 					{
-						if(this.get_bool("boom?"))
-						{
-							if(itemToSpam == "arrow")
-								item.set_u8("arrow type", 3);
-							else if(itemToSpam == "ballista_bolt")
-								item.Tag("bomb ammo");
-								item.getSprite().SetFrame(1);
-						}
-						if(itemToSpam == "keg")
-							item.SendCommand(item.getCommandID("activate"));
-						if(itemToSpam == "mine")
-							item.SendCommand(item.getCommandID("mine_primed"));
-						item.server_setTeamNum(c.getTeamNum());
-						item.setPosition(pos);
-						item.setVelocity(Vec2f(mouse - pos) * (.1f));
-						item.AddScript("TimedTeamChange");
-						item.Init();
+						item.set_u8("arrow type", 3);  // Make bomb arrow
 					}
+					else if(item_to_spam == "ballista_bolt")
+					{
+						item.Tag("bomb ammo");  // Make bomb bolt
+						item.AddScript("BallistaBoltFrameFix.as");
+					}
+				}
+
+				// Configure item
+				item.server_setTeamNum(this.getTeamNum());
+				Vec2f pos = this.getPosition();
+				item.setPosition(pos);
+				item.setVelocity(Vec2f(this.getAimPos() - pos) * (.1f));
+				item.set_u8("team change delay", this.get_u8("team change delay"));
+				item.AddScript("TimedTeamChange.as");
+				item.Init();
+
+				// Arm Explosives
+				if(item_to_spam == "keg")
+				{
+					item.SendCommand(item.getCommandID("activate"));
+				}
+				else if(item_to_spam == "mine")
+				{
+					item.SendCommand(item.getCommandID("mine_primed"));
 				}
 			}
 		}
 	}
-}
-
-void onInit(CRules@ this)
-{
-	Reset();
-}
-
-void onRestart(CRules@ this)
-{
-	Reset();
-}
-
-void Reset()
-{
-	CRules@ rules = getRules();
-	rules.set_string('item to spam', '');
-	rules.set_bool('boom?', false);
-	rules.set_u8('spam delay', 8);
 }
