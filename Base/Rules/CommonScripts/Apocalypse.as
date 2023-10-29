@@ -1,11 +1,9 @@
 
 #define SERVER_ONLY
 
-funcdef void fxn();
+#include "ApocalypseCommon.as"
 
-string apocalypse_id_string = "apocalypse id";
-string apocalypse_toggle_string = "apocalypse toggle";
-string apocalypse_ran_string = "apocalypse ran";
+funcdef void fxn();
 
 // Get a random x based on the width of the map
 u64 get_random_x()
@@ -22,7 +20,7 @@ void KegRain() {
 		if (keg !is null)
 		{
 			keg.SendCommand(keg.getCommandID("activate")); // Light the keg
-			s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 - 1;
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 - 1;
 			keg.setVelocity(Vec2f(spread,0)); // Give it random horizontal momentum
 		}
 	}
@@ -55,7 +53,7 @@ void TrampMineRain() {
 	CMap@ map = getMap();
 	u64 x = map.tilemapwidth * map.tilesize + 100;
 	Vec2f pos;
-	if(!getRules().get_bool(apocalypse_ran_string)) // Only run once
+	if(!getRules().get_bool(APOCALYPSE_RAN_STRING)) // Only run once
 	{ 
 		for(u64 i = 0; i < x; i = i + 30) // Spawn layer of trampolines with spinning tramps on top
 		{
@@ -84,7 +82,7 @@ void TrampMineRain() {
 		CBlob@ mine = server_CreateBlob("mine", 3, pos);
 		if (mine !is null)
 		{
-			s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			mine.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
 			mine.SendCommand(mine.getCommandID("mine_primed")); // Deploy the mine
 			mine.AddScript("DestroyBlocks.as");
@@ -103,7 +101,7 @@ void RandomArrowRain()
 			arrow.set_u8("arrow type", 2 + XORRandom(2)); // Make it randomly a fire or bomb arrow
 			if (arrow !is null)
 			{
-				s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+				s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 				arrow.setVelocity(Vec2f(spread, 1)); // Give it random horizontal momentum, needs a nonzero velocity or the arrow will break immediately
 				arrow.setPosition(pos);
 				arrow.Init();
@@ -121,7 +119,7 @@ void BallistaRain()
 		{
 			ballista_bolt.Tag("bomb ammo"); // Explosive Upgrade
 			ballista_bolt.AddScript("BallistaBoltFrameFix.as");
-			s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			ballista_bolt.setVelocity(Vec2f(spread, 2)); // Give it random horizontal momentum
 			ballista_bolt.Init();
 		}
@@ -135,7 +133,7 @@ void SharkRain()
 		CBlob@ shark = server_CreateBlob("shark", 3, Vec2f(get_random_x(), 0));
 		if (shark !is null)
 		{
-			s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			shark.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
 			shark.setAngularVelocity(XORRandom(101)-50); // Spin it cause memes
 			shark.set_s8("destruction radius", 3);
@@ -151,7 +149,7 @@ void BisonRain()
 		CBlob@ bison = server_CreateBlob("bison", 9, Vec2f(get_random_x(), 0));
 		if (bison !is null)
 		{
-			s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			bison.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
 			bison.setAngularVelocity(XORRandom(101)-50); // Spin it cause memes
 			bison.set_s8("destruction radius", 3);
@@ -167,7 +165,7 @@ void SpikeRain()
 		CBlob@ spike = server_CreateBlob("spikes", 9, Vec2f(get_random_x(), 0));
 		if (spike !is null)
 		{
-			s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			spike.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
 			spike.AddScript("DestroyBlocks.as");
 		}
@@ -181,7 +179,7 @@ void BombRain()
 		CBlob@ bomb = server_CreateBlob("bomb", 9, Vec2f(get_random_x(), 0));
 		if (bomb !is null)
 		{
-			s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			bomb.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
 		}
 	}
@@ -215,7 +213,7 @@ void BoulderRain()
 		CBlob@ boulder = server_CreateBlob("boulder", 9, Vec2f(get_random_x(), 0));
 		if (boulder !is null)
 		{
-			s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			boulder.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
 			boulder.getShape().getConsts().mapCollisions = false;
 			boulder.getShape().getConsts().collidable = false;
@@ -239,7 +237,7 @@ void OrbRain()
 				orb.set_f32("explosive_damage", 4.0f);
 				orb.set_f32("map_damage_radius", 50.0f);
 				orb.set_f32("map_damage_ratio", 100.0f);
-				s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+				s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 				orb.setVelocity(Vec2f(spread, XORRandom(10) + map.getLandYAtX(x)/20)); // Give it random horizontal momentum
 			}
 		}
@@ -267,7 +265,7 @@ void ChickenSpawners()
 
 void SpamBombArrowsFromFace()
 {
-	if (!getRules().get_bool(apocalypse_ran_string))
+	if (!getRules().get_bool(APOCALYPSE_RAN_STRING))
 	{
 		CBlob@[] player_blobs;
 		getBlobsByTag("player", @player_blobs);
@@ -288,7 +286,7 @@ void SpamBombArrowsFromFace()
 
 void SpamBombBoltsFromFace()
 {
-	if (!getRules().get_bool(apocalypse_ran_string))
+	if (!getRules().get_bool(APOCALYPSE_RAN_STRING))
 	{
 		// Increase the delay before swapping teams to avoid killing the thrower
 		getRules().set_u8("team change delay", 4);
@@ -318,7 +316,7 @@ void LongboatRain()
 		CBlob@ longboat = server_CreateBlob("longboat", 9, Vec2f(get_random_x(), 0));
 		if (longboat !is null)
 		{
-			s8 spread = XORRandom(getRules().get_u8("spread")) - getRules().get_u8("spread")/2 + 1;
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			longboat.setVelocity(Vec2f(spread, 4)); // Give it random horizontal momentum
 			longboat.RemoveScript("Wooden");
 			longboat.setAngularVelocity(XORRandom(101)-50); // Spin it cause memes
@@ -347,25 +345,28 @@ fxn@[] apocalypses = {		// Apocalypse Index
 	@SpamBombBoltsFromFace  // 14
 };
 
-void onTick(CRules@ this)
-{	
-	// Check if the game is over
-	if(this.getCurrentState() == GAME_OVER && !this.get_bool(apocalypse_toggle_string))
-	{
-		this.set_bool(apocalypse_toggle_string, true);
-		this.set_bool(apocalypse_ran_string, false);
-	}
+void onStateChange(CRules@ this, const u8 oldState)
+{
+    // Check if the game is over
 
+	if(this.getCurrentState() == GAME_OVER && !this.get_bool(APOCALYPSE_TOGGLE_STRING))
+	{
+		StartApocalypse(this);
+	}
+}
+
+void onTick(CRules@ this)
+{
 	// Run the apocalypse
-	if(this.get_bool(apocalypse_toggle_string) && this.get_s8(apocalypse_id_string) >= 0 && this.get_s8(apocalypse_id_string) < apocalypses.length())	// Avoid out of bounds access
+	if(this.get_bool(APOCALYPSE_TOGGLE_STRING) && this.get_s8(APOCALYPSE_ID_STRING) >= 0 && this.get_s8(APOCALYPSE_ID_STRING) < apocalypses.length())	// Avoid out of bounds access
 	{
 		// Execute apocalypse				
-		apocalypses[this.get_s8(apocalypse_id_string)]();
+		apocalypses[this.get_s8(APOCALYPSE_ID_STRING)]();
 
 		// Flag for apocalypses to execute once
-		if (!this.get_bool(apocalypse_ran_string))
+		if (!this.get_bool(APOCALYPSE_RAN_STRING))
 		{
-			this.set_bool(apocalypse_ran_string, true);
+			this.set_bool(APOCALYPSE_RAN_STRING, true);
 		}
 	}
 }
@@ -373,7 +374,7 @@ void onTick(CRules@ this)
 void onInit(CRules@ this)
 {
 	Reset(this);
-	this.set_u8("spread", 10);
+	this.set_u8(APOCALYPSE_SPREAD_STRING, 10);
 }
 
 void onRestart(CRules@ this)
@@ -383,6 +384,6 @@ void onRestart(CRules@ this)
 
 void Reset(CRules@ this)
 {
-	this.set_s8(apocalypse_id_string, XORRandom(apocalypses.length()));
-	this.set_bool(apocalypse_toggle_string, false);
+	this.set_s8(APOCALYPSE_ID_STRING, XORRandom(apocalypses.length()));
+	this.set_bool(APOCALYPSE_TOGGLE_STRING, false);
 }
