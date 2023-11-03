@@ -1,6 +1,8 @@
 
 #define SERVER_ONLY
 
+#include "Hitters.as"
+
 string destruction_radius_string = "destruction radius";
 
 void onCollision(CBlob@ this, CBlob@ blob, bool solid)
@@ -25,7 +27,18 @@ void DestroyBlocks(CBlob@ this)
 		{
 			for (u8 hit_number = 0; hit_number < 3; hit_number++)
 			{
-				map.server_DestroyTile(this.getPosition() + Vec2f(x, y) * map.tilesize, 10.0f, this);
+                Vec2f pos = this.getPosition() + Vec2f(x, y) * map.tilesize;
+				map.server_DestroyTile(pos, 10.0f, this);
+                CBlob@[] blobs;
+                map.getBlobsAtPosition(pos, blobs);
+                for (u8 i = 0; i < blobs.length; i++)
+                {
+                    CBlob@ blob = blobs[i];
+                    if (blob !is null && blob.getShape().isStatic())
+                    {
+                        this.server_Hit(blob, pos, Vec2f(0, 0), 10.0f, Hitters::mine, true);
+                    }
+                }
 			}
 		}
 	}
