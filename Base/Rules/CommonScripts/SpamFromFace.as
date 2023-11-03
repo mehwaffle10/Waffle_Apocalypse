@@ -53,6 +53,14 @@ void onTick(CBlob@ this)
 				{
 					item.SendCommand(item.getCommandID("mine_primed"));
 				}
+
+                // Destroy terrain
+                s8 destruction_radius = this.get_s8("spam destruction radius");
+                if (destruction_radius > 0)
+                {
+                    item.set_s8("destruction radius", destruction_radius);
+                    item.AddScript("DestroyBlocks.as");
+                }
 			}
 		}
 	}

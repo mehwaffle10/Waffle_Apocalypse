@@ -308,6 +308,29 @@ void SpamBombBoltsFromFace()
 	}
 }
 
+void HomingMinesOfDoom()
+{
+    CMap@ map = getMap();
+	u64 x = map.tilemapwidth * map.tilesize + 100;
+	Vec2f pos;
+	if(getGameTime() % (2 * getTicksASecond()) == 0)
+	{
+		pos.y = 0;
+		pos.x = XORRandom(x);
+		CBlob@ mine = server_CreateBlob("mine", 3, pos);
+		if (mine !is null)
+		{
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
+			mine.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
+			mine.SendCommand(mine.getCommandID("mine_primed")); // Deploy the mine
+            mine.AddScript("SmoothHoming.as");
+            mine.set_f32("homing_speed", 0.1f);
+			mine.AddScript("DestroyBlocks.as");
+            mine.set_s8("destruction radius", 2);
+		}
+	}
+}
+
 /*
 void LongboatRain()
 {
@@ -342,7 +365,8 @@ fxn@[] apocalypses = {		// Apocalypse Index
 	@OrbRain,				// 11
 	@ChickenSpawners,		// 12
 	@SpamBombArrowsFromFace,// 13
-	@SpamBombBoltsFromFace  // 14
+	@SpamBombBoltsFromFace, // 14
+    @HomingMinesOfDoom      // 15
 };
 
 void onStateChange(CRules@ this, const u8 oldState)
