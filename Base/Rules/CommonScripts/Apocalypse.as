@@ -313,7 +313,7 @@ void HomingMinesOfDoom()
     CMap@ map = getMap();
 	u64 x = map.tilemapwidth * map.tilesize + 100;
 	Vec2f pos;
-	if(getGameTime() % (2 * getTicksASecond()) == 0)
+	if(getGameTime() % (getTicksASecond()) == 0)
 	{
 		pos.y = 0;
 		pos.x = XORRandom(x);
@@ -324,7 +324,7 @@ void HomingMinesOfDoom()
 			mine.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
 			mine.SendCommand(mine.getCommandID("mine_primed")); // Deploy the mine
             mine.AddScript("SmoothHoming.as");
-            mine.set_f32("homing_speed", 0.1f);
+            mine.set_f32("homing_speed", 0.05f);
 			mine.AddScript("DestroyBlocks.as");
             mine.set_s8("destruction radius", 2);
 		}
