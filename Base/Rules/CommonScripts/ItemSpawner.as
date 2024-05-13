@@ -1,6 +1,8 @@
 
 #define SERVER_ONLY
 
+#include "ActivationThrowCommon.as"
+
 string spawn_counter_string = "spawn counter";
 string spawn_delay_string = "spawn delay";
 string item_to_spawn_string = "item to spawn";
@@ -35,16 +37,17 @@ void onTick(CBlob@ this)
 					item.Tag("bomb ammo");  // Make bomb bolt
 					item.AddScript("BallistaBoltFrameFix.as");
 				}
+                else if (item_to_spawn == "mine")
+				{
+					item.set_u8("mine_state", 1);  // Arm mine
+				}
 
 				item.Init();
 
 				// Arm Explosives
-				if (item_to_spawn == "keg") {
-					item.SendCommand(item.getCommandID("activate")); // Light the keg
-				}
-				else if (item_to_spawn == "mine")
-				{
-					item.SendCommand(item.getCommandID("mine_primed")); // Deploy the mine
+				if (item_to_spawn == "keg")
+                {
+					server_Activate(item); // Light the keg
 				}
 			}
 		}

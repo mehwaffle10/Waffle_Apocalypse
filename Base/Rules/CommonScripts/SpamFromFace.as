@@ -1,6 +1,8 @@
 
 #define SERVER_ONLY
 
+#include "ActivationThrowCommon.as"
+
 string item_to_spam_string = "item to spam";
 string spam_timer_string = "spam counter";
 string spam_delay_string = "spam delay";
@@ -35,6 +37,11 @@ void onTick(CBlob@ this)
 					}
 				}
 
+                if (item_to_spam == "mine")
+				{
+					item.set_u8("mine_state", 1);  // Arm mine
+				}
+
 				// Configure item
 				item.server_setTeamNum(this.getTeamNum());
 				Vec2f pos = this.getPosition();
@@ -44,14 +51,9 @@ void onTick(CBlob@ this)
 				item.AddScript("TimedTeamChange.as");
 				item.Init();
 
-				// Arm Explosives
 				if(item_to_spam == "keg")
 				{
-					item.SendCommand(item.getCommandID("activate"));
-				}
-				else if(item_to_spam == "mine")
-				{
-					item.SendCommand(item.getCommandID("mine_primed"));
+					server_Activate(item);
 				}
 
                 // Destroy terrain

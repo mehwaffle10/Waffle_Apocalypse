@@ -2,6 +2,7 @@
 #define SERVER_ONLY
 
 #include "ApocalypseCommon.as"
+#include "ActivationThrowCommon.as"
 
 funcdef void fxn();
 
@@ -19,7 +20,7 @@ void KegRain() {
 		CBlob@ keg = server_CreateBlob("keg", 9, pos);
 		if (keg !is null)
 		{
-			keg.SendCommand(keg.getCommandID("activate")); // Light the keg
+			server_Activate(keg);
 			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 - 1;
 			keg.setVelocity(Vec2f(spread,0)); // Give it random horizontal momentum
 		}
@@ -41,7 +42,7 @@ void GiveAllPlayersLitKeg()
 				CBlob@ keg = server_CreateBlob("keg", 9, player_blob.getPosition());
 				if (keg !is null)
 				{
-					keg.SendCommand(keg.getCommandID("activate"));
+					server_Activate(keg);
 					player_blob.server_Pickup(keg);
 				}
 			}
@@ -79,12 +80,15 @@ void TrampMineRain() {
 	{
 		pos.y = 0;
 		pos.x = XORRandom(x);
-		CBlob@ mine = server_CreateBlob("mine", 3, pos);
+		CBlob@ mine = server_CreateBlobNoInit("mine");
 		if (mine !is null)
 		{
+            mine.server_setTeamNum(3);
+            mine.setPosition(pos);
+            mine.set_u8("mine_state", 1);  // Arm mine
+            mine.Init();
 			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			mine.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
-			mine.SendCommand(mine.getCommandID("mine_primed")); // Deploy the mine
 			mine.AddScript("DestroyBlocks.as");
 		}
 	}
@@ -200,7 +204,7 @@ void GetiBombs()
 			if (keg !is null)
 			{
 				princess.server_AttachTo(keg, "KEG"); // Attach the keg to the princess
-				keg.SendCommand(keg.getCommandID("activate")); // Light the keg
+				server_Activate(keg);
 			}
 		}
 	}
@@ -317,12 +321,15 @@ void HomingMinesOfDoom()
 	{
 		pos.y = 0;
 		pos.x = XORRandom(x);
-		CBlob@ mine = server_CreateBlob("mine", 3, pos);
+        CBlob@ mine = server_CreateBlobNoInit("mine");
 		if (mine !is null)
 		{
+            mine.server_setTeamNum(3);
+            mine.setPosition(pos);
+            mine.set_u8("mine_state", 1);  // Arm mine
+            mine.Init();
 			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
 			mine.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
-			mine.SendCommand(mine.getCommandID("mine_primed")); // Deploy the mine
             mine.AddScript("SmoothHoming.as");
             mine.set_f32("homing_speed", 0.05f);
 			mine.AddScript("DestroyBlocks.as");
