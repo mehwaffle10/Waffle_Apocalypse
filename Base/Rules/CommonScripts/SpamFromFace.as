@@ -23,6 +23,11 @@ void onTick(CBlob@ this)
 			CBlob@ item = server_CreateBlobNoInit(item_to_spam);
 			if(item !is null)
 			{
+                CPlayer@ player = this.getPlayer();
+                if (player !is null)
+                {
+                    item.SetDamageOwnerPlayer(player);
+                }
 				// Special actions
 				if(this.get_bool("boom?"))
 				{
