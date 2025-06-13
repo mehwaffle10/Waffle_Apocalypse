@@ -338,6 +338,38 @@ void HomingMinesOfDoom()
 	}
 }
 
+void HomingPrincessOfDoom()
+{
+    CMap@ map = getMap();
+	u64 x = map.tilemapwidth * map.tilesize + 100;
+	Vec2f pos;
+	if(getGameTime() % (getTicksASecond()) == 0)
+	{
+		pos.y = 0;
+		pos.x = XORRandom(x);
+		CBlob@ princess = server_CreateBlob("princess", 3, pos);
+		if (princess !is null)
+		{
+			princess.getAttachments().AddAttachmentPoint("KEG",true).offset = Vec2f(-8,-5); // Add an attachment point to the princess for keg to be in, needs an offset to look normal
+			CBlob@ keg = server_CreateBlob("keg", 9, pos);
+			if (keg !is null)
+			{
+				princess.server_AttachTo(keg, "KEG"); // Attach the keg to the princess
+				server_Activate(keg);
+			}
+			princess.server_setTeamNum(3);
+            princess.setPosition(pos);
+            princess.Init();
+			s8 spread = XORRandom(getRules().get_u8(APOCALYPSE_SPREAD_STRING)) - getRules().get_u8(APOCALYPSE_SPREAD_STRING)/2 + 1;
+			princess.setVelocity(Vec2f(spread, 0)); // Give it random horizontal momentum
+            princess.AddScript("SmoothHoming.as");
+            princess.set_f32("homing_speed", 0.05f);
+			princess.AddScript("DestroyBlocks.as");
+            princess.set_s8("destruction radius", 2);
+		}
+	}
+}
+
 /*
 void LongboatRain()
 {
@@ -373,7 +405,8 @@ fxn@[] apocalypses = {		// Apocalypse Index
 	@ChickenSpawners,		// 12
 	@SpamBombArrowsFromFace,// 13
 	@SpamBombBoltsFromFace, // 14
-    @HomingMinesOfDoom      // 15
+    @HomingMinesOfDoom,     // 15
+    @HomingPrincessOfDoom   // 16
 };
 
 void onStateChange(CRules@ this, const u8 oldState)
